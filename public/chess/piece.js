@@ -52,20 +52,6 @@ Piece.prototype.moveTo = function(targetPosition) {
 };
 
 Piece.prototype.isValidPosition = function(targetPosition) {
-    // This method should be overridden by each specific piece type
-    // to implement its own movement rules
-    throw new Error("isValidPosition must be implemented by subclasses");
-};
-
-Piece.prototype.kill = function(targetPiece) {
-    if (targetPiece) {
-        console.log(`${this.type.charAt(0).toUpperCase() + this.type.slice(1)} killed ${targetPiece.type} at ${targetPiece.position}`);
-        targetPiece.board.removePiece(targetPiece);
-    }
-};
-
-
-Piece.prototype.isValidPosition = function(targetPosition) {
     throw new Error("isValidPosition must be implemented by subclasses");
 };
 
@@ -109,3 +95,4 @@ Piece.prototype.kill = function(targetPiece) {
         console.log(`${this.type.charAt(0).toUpperCase() + this.type.slice(1)} killed ${targetPiece.type}`);
     }
 };
+
