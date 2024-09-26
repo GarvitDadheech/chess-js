@@ -8,12 +8,28 @@ var Piece = function(config){
     }    
 }
 Piece.prototype.moveTo = function(targetPosition) {
+
+    if (this.board.isGameOver()) {
+        console.warn('The game is over, no further moves allowed.');
+        return false;
+    }
+
     const targetPiece = this.board.getPieceAt(targetPosition);
-    
+
     // Check if the move is valid
     if (!this.isValidPosition(targetPosition)) {
         console.warn(`Invalid move for ${this.type}`);
         return false;
+    }
+
+    // Check if the killed piece is a king
+    if (targetPiece.type === 'king') {
+        this.board.gameOver = true;  // Set the gameOver flag
+        const winnerColor = this.color === 'white' ? 'White' : 'Black';
+        
+        // Display the winning message
+        window.alert(`${winnerColor} won the game!`);
+        this.board.reset();
     }
 
     if (this.type === 'pawn' && targetPiece && targetPosition.col === this.position[0]) {

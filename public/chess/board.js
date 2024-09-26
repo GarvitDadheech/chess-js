@@ -2,6 +2,7 @@ var Board = function(config){
     this.root_id = config.root_id;
     this.currentPlayer = "white";
     this.$el = document.getElementById(this.root_id);
+    this.gameOver = false;
     this.generateBoardDom();
     this.addListeners();
 }
@@ -236,6 +237,16 @@ Board.prototype.removePiece = function(piece) {
             delete this.blackPieces[pieceType];
         }
     }
+};
+
+Board.prototype.isGameOver = function() {
+    return this.gameOver;
+};
+
+Board.prototype.reset = function() {
+    console.log("Resetting the board...");
+
+    window.location.reload();
 };
 
 
