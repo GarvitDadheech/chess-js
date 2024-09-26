@@ -7,5 +7,6 @@ var Queen = function(config){
 
 Queen.prototype = new Piece({});
 Queen.prototype.move = function(newPosition){
+    
 
 }
