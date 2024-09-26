@@ -57,33 +57,38 @@ Board.prototype.clearSelection = function(){
     });
 };
 
-Board.prototype.boardClicked = function(event){    
-    this.clearSelection();    
+Board.prototype.boardClicked = function(event) {
     const clickedCell = this.getClickedBlock(event);
-    const selectedPiece = this.getPieceAt(clickedCell)
-    if(selectedPiece){
-        //Add 'selected' class to the clicked piece    
-        this.selectPiece(event.target, selectedPiece);
-    }else{
-        //update position of the selected piece to new position
-        if(this.selectedPiece){
-            if(this.selectedPiece.color!=this.currentPlayer) {
-                console.warn("this is not your turn!");
-                return;
-            }
-            // Attempt to move the selected piece
-            const moveSuccessful = this.selectedPiece.moveTo(clickedCell);
+    const clickedPiece = this.getPieceAt(clickedCell);
 
-            // Only switch turns if the move was valid
+    // If no piece is currently selected
+    if (!this.selectedPiece) {
+        if (clickedPiece && clickedPiece.color === this.currentPlayer) {
+            this.selectPiece(event.target, clickedPiece);
+        } else {
+            console.warn("Please select a piece of your color.");
+        }
+    } 
+    // If a piece is already selected
+    else {
+        // If clicking on a different piece of the same color, select the new piece
+        if (clickedPiece && clickedPiece.color === this.currentPlayer) {
+            this.clearSelection();
+            this.selectPiece(event.target, clickedPiece);
+        } 
+        // If clicking on an empty square or an enemy piece, attempt to move/kill
+        else {
+            const moveSuccessful = this.selectedPiece.moveTo(clickedCell);
             if (moveSuccessful) {
-                this.currentPlayer = this.currentPlayer === "white" ? "black" : "white";
+                this.clearSelection();
                 this.selectedPiece = null;
+                this.currentPlayer = this.currentPlayer === "white" ? "black" : "white";
             } else {
-                console.warn("Invalid move. Turn does not change.");
+                console.warn("Invalid move. Please try again.");
             }
-        }                
-    }    
-}
+        }
+    }
+};
 
 Board.prototype.getPieceAt = function(cell){
     if (!cell || !cell.row || !cell.col) {
@@ -146,19 +151,19 @@ Board.prototype.selectPiece = function(clickedElement, selectedPiece) {
 Board.prototype.initiateGame = function() {
     // Create white pieces
     this.whitePieces = {
-        king: new King({ color: 'white', position: 'E1' }),
-        queen: new Queen({ color: 'white', position: 'D1' }),
+        king: new King({ color: 'white', position: 'E1', board: this }),
+        queen: new Queen({ color: 'white', position: 'D1', board: this }),
         bishops: [
-            new Bishop({ color: 'white', position: 'C1' }),
-            new Bishop({ color: 'white', position: 'F1' })
+            new Bishop({ color: 'white', position: 'C1', board: this }),
+            new Bishop({ color: 'white', position: 'F1', board: this })
         ],
         knights: [
-            new Knight({ color: 'white', position: 'B1' }),
-            new Knight({ color: 'white', position: 'G1' })
+            new Knight({ color: 'white', position: 'B1', board: this }),
+            new Knight({ color: 'white', position: 'G1', board: this })
         ],
         rooks: [
-            new Rook({ color: 'white', position: 'A1' }),
-            new Rook({ color: 'white', position: 'H1' })
+            new Rook({ color: 'white', position: 'A1', board: this }),
+            new Rook({ color: 'white', position: 'H1', board: this })
         ],
         pawns: []
     };
@@ -170,19 +175,19 @@ Board.prototype.initiateGame = function() {
 
     // Create black pieces
     this.blackPieces = {
-        king: new King({ color: 'black', position: 'E8' }),
-        queen: new Queen({ color: 'black', position: 'D8' }),
+        king: new King({ color: 'black', position: 'E8', board: this }),
+        queen: new Queen({ color: 'black', position: 'D8', board: this }),
         bishops: [
-            new Bishop({ color: 'black', position: 'C8' }),
-            new Bishop({ color: 'black', position: 'F8' })
+            new Bishop({ color: 'black', position: 'C8', board: this }),
+            new Bishop({ color: 'black', position: 'F8', board: this })
         ],
         knights: [
-            new Knight({ color: 'black', position: 'B8' }),
-            new Knight({ color: 'black', position: 'G8' })
+            new Knight({ color: 'black', position: 'B8', board: this }),
+            new Knight({ color: 'black', position: 'G8', board: this })
         ],
         rooks: [
-            new Rook({ color: 'black', position: 'A8' }),
-            new Rook({ color: 'black', position: 'H8' })
+            new Rook({ color: 'black', position: 'A8', board: this }),
+            new Rook({ color: 'black', position: 'H8', board: this })
         ],
         pawns: []
     };
@@ -211,6 +216,26 @@ Board.prototype.renderAllPieces = function() {
             piece.render();
         }
     });
+};
+
+Board.prototype.removePiece = function(piece) {
+    // Check and remove from white pieces
+    for (let pieceType in this.whitePieces) {
+        if (Array.isArray(this.whitePieces[pieceType])) {
+            this.whitePieces[pieceType] = this.whitePieces[pieceType].filter(p => p !== piece);
+        } else if (this.whitePieces[pieceType] === piece) {
+            delete this.whitePieces[pieceType];
+        }
+    }
+
+    // Check and remove from black pieces
+    for (let pieceType in this.blackPieces) {
+        if (Array.isArray(this.blackPieces[pieceType])) {
+            this.blackPieces[pieceType] = this.blackPieces[pieceType].filter(p => p !== piece);
+        } else if (this.blackPieces[pieceType] === piece) {
+            delete this.blackPieces[pieceType];
+        }
+    }
 };
 
 
