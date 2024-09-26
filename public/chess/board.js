@@ -77,6 +77,7 @@ Board.prototype.boardClicked = function(event){
             // Only switch turns if the move was valid
             if (moveSuccessful) {
                 this.currentPlayer = this.currentPlayer === "white" ? "black" : "white";
+                this.selectedPiece = null;
             } else {
                 console.warn("Invalid move. Turn does not change.");
             }
