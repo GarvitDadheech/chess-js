@@ -248,5 +248,3 @@ Board.prototype.reset = function() {
 
     window.location.reload();
 };
-
-
