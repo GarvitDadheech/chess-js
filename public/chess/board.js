@@ -1,5 +1,6 @@
 var Board = function(config){
     this.root_id = config.root_id;
+    this.currentPlayer = "white";
     this.$el = document.getElementById(this.root_id);
     this.generateBoardDom();
     this.addListeners();
@@ -8,7 +9,6 @@ var Board = function(config){
 Board.prototype.addListeners = function(){
     this.$el.addEventListener('click', this.boardClicked.bind(this));
 }
-
 Board.prototype.generateBoardDom = function(config){
     let boardHTML = '<ul id="game-ct">';
     const columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
@@ -67,7 +67,19 @@ Board.prototype.boardClicked = function(event){
     }else{
         //update position of the selected piece to new position
         if(this.selectedPiece){
-            this.selectedPiece.moveTo(clickedCell);        
+            if(this.selectedPiece.color!=this.currentPlayer) {
+                console.warn("this is not your turn!");
+                return;
+            }
+            // Attempt to move the selected piece
+            const moveSuccessful = this.selectedPiece.moveTo(clickedCell);
+
+            // Only switch turns if the move was valid
+            if (moveSuccessful) {
+                this.currentPlayer = this.currentPlayer === "white" ? "black" : "white";
+            } else {
+                console.warn("Invalid move. Turn does not change.");
+            }
         }                
     }    
 }
@@ -152,7 +164,7 @@ Board.prototype.initiateGame = function() {
 
     // Create white pawns
     for (let i = 0; i < 8; i++) {
-        this.whitePieces.pawns.push(new Pawn({ color: 'white', position: String.fromCharCode(65 + i) + '2' }));
+        this.whitePieces.pawns.push(new Pawn({ color: 'white', position: String.fromCharCode(65 + i) + '2', board: this}));
     }
 
     // Create black pieces
@@ -176,7 +188,7 @@ Board.prototype.initiateGame = function() {
 
     // Create black pawns
     for (let i = 0; i < 8; i++) {
-        this.blackPieces.pawns.push(new Pawn({ color: 'black', position: String.fromCharCode(65 + i) + '7' }));
+        this.blackPieces.pawns.push(new Pawn({ color: 'black', position: String.fromCharCode(65 + i) + '7',board:this }));
     }
 };
 
@@ -199,3 +211,5 @@ Board.prototype.renderAllPieces = function() {
         }
     });
 };
+
+
